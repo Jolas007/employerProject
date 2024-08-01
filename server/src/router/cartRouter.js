@@ -1,50 +1,44 @@
 const express = require("express");
-const { Cart, User } = require("../../db/models");
+const { Cart } = require("../../db/models");
 const { verifyAccessToken } = require("../middleware/verifyTokens");
-const cart = require("../../db/models/cart");
 const cartRouter = express.Router();
 
 cartRouter.route("/").get(async (req, res) => {
-  //получение содержимого корзины
   try {
     const allItemsInCart = await Cart.findAll();
     res.status(200).json(allItemsInCart);
   } catch (err) {}
 });
 
-cartRouter.route("/update/:id").post(async (req, res) => {
-  const { sockId, counter } = req.body;
-  const userId = req.params.id;
-  if (!sockId || counter == null) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
+cartRouter.route("/add").post(verifyAccessToken, async (req, res) => {
+  const { id } = req.params;
+  const { counter } = req.body;
+  const userId = res.locals.user.id;
   try {
-    const user = await User.findByPk(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    let cartItem = await Cart.findOne({
-      where: {
-        userId: userId,
-        ordersId: ordersId,
-      },
-    });
+    const cartItem = await Basket.findOne({ where: { userId, sockId: id } });
     if (cartItem) {
-      cartItem.counter += counter;
-      await Cart.save();
+      basketItem.count += counter;
+      await cartItem.save();
     } else {
-      await Basket.create({
-        userId: userId,
-        ordersId: ordersId,
-        quantity: quantity,
-      });
+      await Cart.create({ userId, sockId: id, count: counter });
     }
-    const cartItems = await Basket.findAll({
-      where: { userId },
-    });
-    res.status(200).json(cartItems);
   } catch (error) {
     res.status(500).json({ error: "Ошибка при добавлении товара в корзину" });
+  }
+});
+
+cartRouter.route("/delete.:id").delete(verifyAccessToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const cartItem = await Cart.findOne({ where: { id } });
+    if (cartItem) {
+      await cartItem.destroy();
+      res.status(200).json({ message: "Товар удалён из корзины" });
+    } else {
+      res.status(404).json({ error: "Товар не найден в корзине" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Ошибка при удалении товара из корзины" });
   }
 });
 
