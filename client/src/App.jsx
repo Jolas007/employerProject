@@ -1,35 +1,121 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect, useState } from "react";
+import Layout from "./components/Layout";
+import MainPage from "./components/pages/MainPage";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
+import SignUpPage from "./components/pages/SignUpPage";
+import axiosInstance, { setAccessToken } from "./axiosInstance";
+import SignInPage from "./components/pages/SignInPage";
+import ProtectedRoute from "./components/hoc/ProtectedRoute";
+import CartPage from "./components/pages/CartPage";
+import SockGeneratorPage from "./components/pages/SockGeneratorPage";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState();
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  useEffect(() => {
+    axiosInstance
+      .get("/tokens/refresh")
+      .then((res) => {
+        const { user, accessToken } = res.data;
+        setUser(user);
+        setAccessToken(accessToken);
+      })
+      .catch(() => {
+        setUser(null);
+        setAccessToken("");
+      });
+  }, []);
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    const res = await axiosInstance.post("/auth/signup", data);
+    if (res.status === 200) {
+      setUser(res.data.user);
+      setAccessToken(res.data.accessToken);
+    }
+  };
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+    const res = await axiosInstance.post("/auth/signin", data);
+    if (res.status === 200) {
+      setUser(res.data.user);
+      setAccessToken(res.data.accessToken);
+    }
+    window.location.href = "/";
+  };
+
+  const handleLogout = async () => {
+    const res = await axiosInstance.post("/auth/logout");
+    if (res.status === 200) {
+      setUser(null);
+      setAccessToken("");
+    }
+  };
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout user={user} handleLogout={handleLogout} />,
+      children: [
+        {
+          path: "/",
+          element: (
+            <ProtectedRoute isAllowed={!!user} redirectPath="/signin">
+              <MainPage user={user} />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/cart",
+          element: (
+            <ProtectedRoute isAllowed={!!user} redirectPath="/signin">
+              <CartPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/generator",
+          element: (
+            <ProtectedRoute isAllowed={!!user} redirectPath="/signin">
+              <SockGeneratorPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/signup",
+          element: (
+            <ProtectedRoute isAllowed={!user} redirectPath="/">
+              <SignUpPage handleSignUp={handleSignUp} />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "/signin",
+          element: (
+            <ProtectedRoute isAllowed={!user} redirectPath="/">
+              <SignInPage handleSignIn={handleSignIn} />
+            </ProtectedRoute>
+          ),
+        },
+
+        {
+          path: "*",
+          element: <Navigate to="/" />,
+        },
+      ],
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

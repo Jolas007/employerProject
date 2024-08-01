@@ -1,16 +1,14 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
-import Container from 'react-bootstrap/Container';
-import NavBar from './ui/NavBar';
-import Loader from './HOCs/Loader';
+import React from "react";
+import NavBar from "./ui/NavBar";
+import Footer from "./ui/Footer";
+import { Outlet } from "react-router-dom";
 
-export default function Layout({ user, logoutHandler }) {
+export default function Layout({ user, handleLogout }) {
   return (
-    <Loader showSpinner={user.status === 'fetching'}>
-      <Container>
-        <NavBar user={user} logoutHandler={logoutHandler} />
-        <Outlet />
-      </Container>
-    </Loader>
+    <>
+      <NavBar user={user} handleLogout={handleLogout} />
+      <Outlet />
+      <Footer />
+    </>
   );
 }
