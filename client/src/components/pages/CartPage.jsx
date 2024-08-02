@@ -1,64 +1,85 @@
-import axiosInstance from "../../axiosInstance";
-import React, { useState, useEffect } from "react";
-import CartCard from "../ui/CartCard";
+import React from "react";
 
-export default function CartPage() {
-  const [socks, setSocks] = useState([]);
-  const [colors, setColors] = useState([]);
-
-  useEffect(() => {
-    axiosInstance("/socks").then(({ data }) => {
-      setSocks(data);
-    });
-
-    axiosInstance("/colors").then(({ data }) => {
-      setColors(data);
-    });
-  }, []);
-
-  const handleIncrement = (id) => {
-    setSocks((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, counter: item.counter + 1 } : item
-      )
-    );
-  };
-
-  const handleDecrement = (id) => {
-    setSocks((prev) =>
-      prev.map((item) =>
-        item.id === id && item.counter > 0
-          ? { ...item, counter: item.counter - 1 }
-          : item
-      )
-    );
-  };
-
-  const deleteHandler = async (id) => {
-    try {
-      await axiosInstance.delete(`/socks/delete/${id}`);
-      setSocks((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("Error deleting sock:", error);
-    }
-  };
-
+export default function CartPage({ cartItems }) {
   return (
-    <div className="container">
-      <h2>Cart</h2>
-      <div className="row">
-        {socks.map((el) => (
-          <div key={el.id} className="col-4">
-            <CartCard
-              socks={el}
-              handleIncrement={handleIncrement}
-              handleDecrement={handleDecrement}
-              deleteHandler={deleteHandler}
-              colors={colors}
-            />
-          </div>
-        ))}
-      </div>
+    <div>
+      <h2>Здесь будут отображаться товары в корзине</h2>
+      {cartItems.length === 0 ? (
+        <p>Корзина пуста.</p>
+      ) : (
+        <ul>
+          {cartItems.map((item, index) => (
+            <li
+              key={index}
+              style={{ position: "relative", marginBottom: "20px" }}
+            >
+              <p>Цвет: {item.color}</p>
+              <div
+                style={{
+                  width: "300px",
+                  height: "600px",
+                  position: "relative",
+                }}
+              >
+                <div
+                  style={{
+                    backgroundColor: item.color,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 1,
+                    opacity: 0.7,
+                  }}
+                />
+                {item.pattern && (
+                  <img
+                    src={item.pattern.name}
+                    alt="Узор"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 2,
+                      opacity: 0.5,
+                      mixBlendMode: "multiply",
+                    }}
+                  />
+                )}
+                {item.image && (
+                  <img
+                    src={item.image.name} // Предполагаю, что здесь путь к изображению
+                    alt="Изображение"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      zIndex: 3,
+                    }}
+                  />
+                )}
+                <img
+                  src="/socksfinal.png" // Фиксированное изображение носка
+                  alt="Носок"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 4,
+                  }}
+                />
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

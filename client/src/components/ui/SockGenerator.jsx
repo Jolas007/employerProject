@@ -11,7 +11,6 @@ function SockGenerator({ addToCartHandler, isAdded }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedPattern, setSelectedPattern] = useState(null);
 
-  // Моковые данные для узоров и изображений
   const mockPatterns = [
     {
       name: "https://gas-kvas.com/uploads/posts/2023-01/1674487918_gas-kvas-com-p-risunki-uzori-rossii-14.png",
@@ -64,6 +63,15 @@ function SockGenerator({ addToCartHandler, isAdded }) {
     setBackgroundColor("black");
   };
 
+  const saveToCart = () => {
+    const sockData = {
+      color: backgroundColor,
+      pattern: selectedPattern,
+      image: selectedImage,
+    };
+    addToCartHandler(sockData);
+  };
+
   return (
     <Container>
       <Row
@@ -112,7 +120,7 @@ function SockGenerator({ addToCartHandler, isAdded }) {
                   height: "auto",
                   zIndex: 2,
                   opacity: 0.5,
-                  mixBlendMode: "multiply", // Применение стиля наложения
+                  mixBlendMode: "multiply",
                 }}
                 alt="Pattern"
               />
@@ -163,7 +171,7 @@ function SockGenerator({ addToCartHandler, isAdded }) {
                   fontSize: "22px",
                   whiteSpace: "nowrap",
                 }}
-                onClick={() => (window.location.href = "/basket")}
+                onClick={() => (window.location.href = "/cart")}
               >
                 Перейти в корзину
               </Button>
@@ -176,13 +184,7 @@ function SockGenerator({ addToCartHandler, isAdded }) {
                   backgroundColor: "#343a40",
                   border: "none",
                 }}
-                onClick={() =>
-                  addToCartHandler({
-                    color: backgroundColor,
-                    image: selectedImage,
-                    pattern: selectedPattern,
-                  })
-                }
+                onClick={saveToCart}
               >
                 Добавить в корзину
               </Button>

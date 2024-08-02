@@ -15,6 +15,7 @@ import SockGeneratorPage from "./components/pages/SockGeneratorPage";
 
 function App() {
   const [user, setUser] = useState();
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     axiosInstance
@@ -29,6 +30,9 @@ function App() {
         setAccessToken("");
       });
   }, []);
+  const addToCartHandler = (item) => {
+    setCartItems((prev) => [...prev, item]);
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -78,7 +82,7 @@ function App() {
           path: "/cart",
           element: (
             <ProtectedRoute isAllowed={!!user} redirectPath="/signin">
-              <CartPage />
+              <CartPage cartItems={cartItems} />
             </ProtectedRoute>
           ),
         },
@@ -86,7 +90,7 @@ function App() {
           path: "/generator",
           element: (
             <ProtectedRoute isAllowed={!!user} redirectPath="/signin">
-              <SockGeneratorPage />
+              <SockGeneratorPage addToCartHandler={addToCartHandler} />
             </ProtectedRoute>
           ),
         },

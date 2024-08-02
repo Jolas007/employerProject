@@ -3,9 +3,10 @@ import { Row } from "react-bootstrap";
 import SockGenerator from "../ui/SockGenerator";
 import axiosInstance from "../../axiosInstance";
 
-export default function GeneratorPage() {
+export default function GeneratorPage({ addToCartHandler }) {
   const [myImages, setMyImages] = useState([]);
   const [myPatterns, setMyPatterns] = useState([]);
+  const [isAdded, setIsAdded] = useState(false);
   useEffect(() => {
     axiosInstance("/socks/account/image").then(({ data }) => setMyImages(data));
   }, []);
@@ -14,13 +15,13 @@ export default function GeneratorPage() {
       setMyPatterns(data)
     );
   }, []);
-  const [isAdded, setisAdded] = useState(false);
-  const addToCartHandler = async (obj) => {
+
+  const localAddToCartHandler = async (obj) => { // Переименовал функцию
     console.log(obj);
     const response = await axiosInstance.post(`/socks/account/basket/add`, obj);
-    setisAdded((prev) => prev === false && true);
-    console.log(isAdded);
+    setIsAdded(true);
   };
+
   return (
     <>
       <Row className="mt-3">
@@ -28,7 +29,10 @@ export default function GeneratorPage() {
       </Row>
       <Row className="mt-3">
         <SockGenerator
-          addToCartHandler={addToCartHandler}
+          addToCartHandler={(item) => {
+            addToCartHandler(item);
+            setIsAdded(true);
+          }}
           isAdded={isAdded}
           myImages={myImages}
           myPatterns={myPatterns}
