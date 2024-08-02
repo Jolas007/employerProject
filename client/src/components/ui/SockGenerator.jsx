@@ -5,11 +5,14 @@ import Image from "react-bootstrap/Image";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { useNavigate } from "react-router-dom";
 
 function SockGenerator({ addToCartHandler, isAdded }) {
   const [backgroundColor, setBackgroundColor] = useState("black");
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedPattern, setSelectedPattern] = useState(null);
+
+  const navigate = useNavigate(); // Use useNavigate hook
 
   const mockPatterns = [
     {
@@ -164,29 +167,31 @@ function SockGenerator({ addToCartHandler, isAdded }) {
               marginTop: "10px",
             }}
           >
-            {isAdded ? (
+            <Button
+              style={{
+                width: "auto",
+                fontSize: "22px",
+                whiteSpace: "nowrap",
+                backgroundColor: "#343a40",
+                border: "none",
+              }}
+              onClick={saveToCart}
+            >
+              Добавить в корзину
+            </Button>
+            {isAdded && (
               <Button
                 style={{
                   width: "auto",
                   fontSize: "22px",
                   whiteSpace: "nowrap",
-                }}
-                onClick={() => (window.location.href = "/cart")}
-              >
-                Перейти в корзину
-              </Button>
-            ) : (
-              <Button
-                style={{
-                  width: "auto",
-                  fontSize: "22px",
-                  whiteSpace: "nowrap",
+                  marginLeft: "10px",
                   backgroundColor: "#343a40",
                   border: "none",
                 }}
-                onClick={saveToCart}
+                onClick={() => navigate("/cart")}
               >
-                Добавить в корзину
+                Перейти в корзину
               </Button>
             )}
           </div>
@@ -288,11 +293,10 @@ function SockGenerator({ addToCartHandler, isAdded }) {
                 fontSize: "16px",
                 whiteSpace: "nowrap",
                 backgroundColor: "#343a40",
-                border: "none",
               }}
               onClick={deletePicHandler}
             >
-              Сбросить все
+              Сбросить всё
             </Button>
           </div>
         </Col>

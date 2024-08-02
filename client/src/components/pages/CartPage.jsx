@@ -7,17 +7,44 @@ export default function CartPage({ cartItems }) {
       {cartItems.length === 0 ? (
         <p>Корзина пуста.</p>
       ) : (
-        <ul>
+        <ul
+          style={{
+            display: "flex",
+            flexWrap: "wrap", // Позволяет элементам переходить на следующую строку при необходимости
+            padding: 0,
+            margin: 0,
+            listStyleType: "none",
+          }}
+        >
           {cartItems.map((item, index) => (
             <li
               key={index}
-              style={{ position: "relative", marginBottom: "20px" }}
+              style={{
+                margin: "10px",
+                position: "relative",
+                width: "300px",
+                height: "600px",
+                boxSizing: "border-box",
+                border: "3px solid #000", // Граница носка
+                borderRadius: "15px", // Закругление углов (по желанию)
+                overflow: "hidden", // Скрытие переполняющего содержимого
+                backgroundColor: "#fff", // Цвет фона элемента списка
+              }}
             >
-              <p>Цвет: {item.color}</p>
+              <p
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  left: "10px",
+                  zIndex: 5,
+                  color: "#000",
+                  fontWeight: "bold",
+                }}
+              ></p>
               <div
                 style={{
-                  width: "300px",
-                  height: "600px",
+                  width: "100%",
+                  height: "100%",
                   position: "relative",
                 }}
               >
@@ -75,6 +102,26 @@ export default function CartPage({ cartItems }) {
                     zIndex: 4,
                   }}
                 />
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: "10px",
+                  left: "10px",
+                  right: "10px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: 0,
+                    padding: 0,
+                  }}
+                ></label>
               </div>
             </li>
           ))}
